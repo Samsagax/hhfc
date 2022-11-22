@@ -16,7 +16,7 @@ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 with hhfc. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import os
+from . import util
 
 
 class Fan:
@@ -31,7 +31,7 @@ class Fan:
     max_value: int
 
     def __init__(self, fan_config: dict):
-        full_path = Fan._find_driver_path(fan_config["driver_name"])
+        full_path = util.find_driver_path(fan_config["driver_name"])
 
         self.name = fan_config["name"]
         self.driver_name = fan_config["driver_name"]
@@ -40,18 +40,6 @@ class Fan:
         self.pwm_input = full_path + fan_config["handle"]
         self.min_val = fan_config["min_control_value"]
         self.max_val = fan_config["max_control_value"]
-
-    @staticmethod
-    def _find_driver_path(driver_name: str) -> str:
-        base_path = "/sys/class/hwmon/"
-        for driver in os.listdir(base_path):
-            full_path = base_path + driver + "/"
-            with open(full_path + "name", encoding="utf-8") as driver_path:
-                test_name = driver_path.read().strip()
-            if driver_name == test_name:
-                return full_path
-
-        raise RuntimeError(f"Driver with name {driver_name} not found.")
 
     def take_control(self) -> bool:
         """Atempt to take control of the fan from automatic control"""
