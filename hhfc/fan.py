@@ -27,8 +27,8 @@ class Fan:
     pwm_input: str
     pwm_enable: str
     fan_input: str
-    min_value: int
-    max_value: int
+    min_val: int
+    max_val: int
 
     def __init__(self, fan_config: dict):
         full_path = util.find_driver_path(fan_config["driver_name"])
@@ -52,17 +52,20 @@ class Fan:
         with open(self.pwm_enable, "r", encoding="utf-8") as enable:
             return enable.read() == "1"
 
-    def set_duty_cycle(self, duty_cycle: int) -> None:
-        """Sets duty cycle for this fan in the range [min_value-max_value]"""
-        if duty_cycle < self.min_value or duty_cycle > self.max_value:
-            raise ValueError("Duty cycle has to ve in the range "
-                             f"[{self.min_value}-{self.max_value}]")
+    def set_duty_cycle(self, duty_cycle: float) -> None:
+        """Sets duty cycle for this fan in the range [min_value-max_value]
+        for the hwmon interface of choice. The input value `duty_cycle` should
+        be in the range [0-100]. This function will scale acordingly
+        """
+        if duty_cycle < 0 or duty_cycle > 100:
+            raise ValueError("Duty cycle has to be in the range [0-100]")
+        duty = duty_cycle * (self.max_val - self.min_val) / 100.0
 
         if not self.check_control():
             raise IOError("Cant write to the fan control file")
 
         with open(self.pwm_input, "w", encoding="utf-8") as pwm:
-            pwm.write(str(duty_cycle))
+            pwm.write(str(int(duty)))
 
 
 def fan_from_config(fan_config: dict) -> Fan:
