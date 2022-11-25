@@ -34,7 +34,7 @@ class Sensor:
         self.name = sensor_config["name"]
         self.driver_name = sensor_config["driver_name"]
         self.sensor_input = full_path + sensor_config["temp_input"]
-        self.divisor = sensor_config["divisor"]
+        self.divisor = sensor_config["divisor"] if "divisor" in sensor_config else 1
         self.curve = sensor_config["curve"]
 
     def read_input(self) -> float:
