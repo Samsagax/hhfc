@@ -1,0 +1,65 @@
+# Configuration file for fan control
+#
+# The file describes fans an sensors, each fan is controlled with a set of
+# one or more sensors. Each sensor describes a fan curve. The final output
+# value for the fan would be the maximum of all the sensors monitored by that
+# fan.
+#
+# Each sensor need to specify three points in the curve temp/duty-cycle.
+# The lowest one defines a low threshold. Below the low temperature the fan
+# duty-cycle is set to the same low value. The highest point defines the upper
+# threshold in the same way. The middle point defines the curve. Each
+# intermediate value is interpolated quadratically between the low and high
+# thresholds.
+#
+# Fans re defined with a low and high control values, each value in the 0-100%
+# duty-cycle would be mapped to those values. The handle defines wich file
+# the monitor should write to. The driver_name is used to pick the correct
+# hwmon directory, all other files are relative to it. Optionally the fan can
+# have a fan_input value to monitor RPMs. Each fan will check all its sensors
+# temperatures accoding to interval value.
+
+# All names and paths should be relative to BASE_DIR
+
+INTERVAL: 1.0
+
+SENSORS:
+  - name: "cpu"
+    driver_name: "k10temp"
+    temp_input: "temp1_input"
+    divisor: 1000
+    curve:
+      low:
+        temp: 20
+        duty: 0
+      mid:
+        temp: 60
+        duty: 50
+      high:
+        temp: 85
+        duty: 100
+
+  - name: "gpu"
+    driver_name: "amdgpu"
+    temp_input: "temp1_input"
+    curve:
+      low:
+        temp: 50
+        duty: 0
+      mid:
+        temp: 60
+        duty: 50
+      high:
+        temp: 85
+        duty: 100
+
+FANS:
+  - name: "fan1"
+    driver_name: "acpitz"
+    handle: "pwm1"
+    max_control_value: 255
+    min_control_value: 0
+    fan_input: "fan1_input"
+    sensors:
+     - "cpu"
+     - "gpu"
