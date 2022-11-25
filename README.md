@@ -1,12 +1,20 @@
+# NOTE: This project is currently in the very early stages of development.
+
+Is still on non-functional state but is published as a way to get feedback
+and force me not to procrastinate it further.
+
 # The Hwmon Handheld Fan Controller (hhfc)
 
-This is meant to be a universal controller for anything that can be read from
-hwmon sysfs filesystem. Originally designed for handhelds but can be configured
-for anything that has sensors and fans.
+This is meant to be a universal controller for anything that can be read
+and writen from hwmon sysfs filesystem.
+Originally designed for handhelds but can be configured for anything that has
+sensors and fans exposed via hwmon sysfs (i.e. `/sys/class/hwmon/hwmon?/*`)
 
 ## Configuration
 
-Check the sample configuration file
+The driver uses FANS and SENSORS. Any FAN can watch one or more sensors.
+
+Check the sample configuration file for details.
 
 ## Usage
 
