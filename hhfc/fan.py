@@ -29,6 +29,7 @@ class Fan:
     fan_input: str
     min_val: int
     max_val: int
+    sensors: list[str]
 
     def __init__(self, fan_config: dict):
         full_path = util.find_driver_path(fan_config["driver_name"])
@@ -40,12 +41,19 @@ class Fan:
         self.pwm_input = full_path + fan_config["handle"]
         self.min_val = fan_config["min_control_value"]
         self.max_val = fan_config["max_control_value"]
+        self.sensors = fan_config["sensors"]
 
     def take_control(self) -> bool:
         """Atempt to take control of the fan from automatic control"""
         with open(self.pwm_enable, "r+", encoding="utf-8") as enable:
             enable.write("1")
         return self.check_control()
+
+    def release_control(self) -> bool:
+        """Atempt to take control of the fan from automatic control"""
+        with open(self.pwm_enable, "r+", encoding="utf-8") as enable:
+            enable.write("0")
+        return not self.check_control()
 
     def check_control(self) -> bool:
         """Check if we are controlling this fan"""
@@ -67,6 +75,13 @@ class Fan:
         with open(self.pwm_input, "w", encoding="utf-8") as pwm:
             pwm.write(str(int(duty)))
 
+    def read_input(self) -> int:
+        """Read input for this fan. The value units are not converted"""
+        with open(self.fan_input, "r", encoding="utf-8") as inp:
+            return int(inp.read())
+
+    def __str__(self) -> str:
+        return (self.name + ": " + str(self.read_input()))
 
 def fan_from_config(fan_config: dict) -> Fan:
     """Generate a Fan object with the configration passed as dictionary"""

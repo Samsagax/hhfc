@@ -59,3 +59,10 @@ class Config:
         return self.config["SENSORS"][sensor_idx] \
             if (sensor_idx is not None) else \
             self.config["SENSORS"]
+
+    def get_interval(self) -> float:
+        """Returns interval data from configuration"""
+        if not self.config:
+            self._read_configuration()
+
+        return float(self.config["INTERVAL"])
