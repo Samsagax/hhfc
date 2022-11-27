@@ -28,6 +28,7 @@ SENSORS:
     driver_name: "k10temp"
     temp_input: "temp1_input"
     divisor: 1000
+    offset: 20
     curve:
       low:
         temp: 20
@@ -42,6 +43,8 @@ SENSORS:
   - name: "gpu"
     driver_name: "amdgpu"
     temp_input: "temp1_input"
+    divisor: 1000
+    offset: 20
     curve:
       low:
         temp: 50

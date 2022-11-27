@@ -26,6 +26,7 @@ class Sensor:
     driver_name: str
     temp_input: str
     divisor: float
+    offset: float
     curve: dict
 
     def __init__(self, sensor_config: dict):
@@ -35,12 +36,13 @@ class Sensor:
         self.driver_name = sensor_config["driver_name"]
         self.sensor_input = full_path + sensor_config["temp_input"]
         self.divisor = sensor_config["divisor"] if "divisor" in sensor_config else 1
+        self.offset = sensor_config["offset"] if "offset" in sensor_config else 0
         self.curve = sensor_config["curve"]
 
     def read_input(self) -> float:
         """Check if we are controlling this fan"""
         with open(self.sensor_input, "r", encoding="utf-8") as raw_reading:
-            return float(raw_reading.read()) / self.divisor
+            return float(raw_reading.read()) / self.divisor + self.offset
 
     def get_desired_duty_cycle(self) -> int:
         """Returns duty cycle for the current sensor state according to the
