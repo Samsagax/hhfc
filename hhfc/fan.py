@@ -58,7 +58,8 @@ class Fan:
     def check_control(self) -> bool:
         """Check if we are controlling this fan"""
         with open(self.pwm_enable, "r", encoding="utf-8") as enable:
-            return enable.read() == "1"
+            string = enable.read()
+            return int(string) == 1
 
     def set_duty_cycle(self, duty_cycle: float) -> None:
         """Sets duty cycle for this fan in the range [min_value-max_value]
