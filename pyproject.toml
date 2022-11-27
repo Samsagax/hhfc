@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hhfc"
+version = "0.0.1"
+authors = [
+  { name="Joaquín Ignacio Aramendía", email="samsagax@gmail.com" },
+]
+description = "hhfc - user space driver for fans based on hwmon sysfs"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = ["pyyaml"]
+
+[project.urls]
+"Homepage" = "https://github.com/Samsagax/hhfc"
+"Bug Tracker" = "https://github.com/Samsagax/hhfc/issues"
+
+[tool.setuptools.packages.find]
+include = ["hhfc"]
+
+[project.scripts]
+hhfc = "hhfc.__main__:main"
