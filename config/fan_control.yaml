@@ -31,10 +31,10 @@ SENSORS:
     offset: 20
     curve:
       low:
-        temp: 20
+        temp: 50
         duty: 0
       mid:
-        temp: 60
+        temp: 70
         duty: 50
       high:
         temp: 85
@@ -50,7 +50,7 @@ SENSORS:
         temp: 50
         duty: 0
       mid:
-        temp: 60
+        temp: 70
         duty: 50
       high:
         temp: 85
@@ -58,7 +58,7 @@ SENSORS:
 
 FANS:
   - name: "fan1"
-    driver_name: "acpitz"
+    driver_name: "oxpec"
     handle: "pwm1"
     max_control_value: 255
     min_control_value: 0
