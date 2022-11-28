@@ -1,7 +1,16 @@
 # Configuration file for fan control
 #
 # The file describes fans an sensors, each fan is controlled with a set of
-# one or more sensors. Each sensor describes a fan curve. The final output
+# one or more sensors.
+#
+# Fans re defined with a low and high control values, each value in the 0-100%
+# duty-cycle would be mapped to those values. The handle defines wich file
+# the monitor should write to. The driver_name is used to pick the correct
+# hwmon directory, all other files are relative to it. Optionally the fan can
+# have a fan_input value to monitor RPMs. Each fan will check all its sensors
+# temperatures accoding to interval value.
+#
+# Each sensor monitored by a fan describes a fan curve. The final output
 # value for the fan would be the maximum of all the sensors monitored by that
 # fan.
 #
@@ -11,15 +20,6 @@
 # threshold in the same way. The middle point defines the curve. Each
 # intermediate value is interpolated quadratically between the low and high
 # thresholds.
-#
-# Fans re defined with a low and high control values, each value in the 0-100%
-# duty-cycle would be mapped to those values. The handle defines wich file
-# the monitor should write to. The driver_name is used to pick the correct
-# hwmon directory, all other files are relative to it. Optionally the fan can
-# have a fan_input value to monitor RPMs. Each fan will check all its sensors
-# temperatures accoding to interval value.
-
-# All names and paths should be relative to BASE_DIR
 
 INTERVAL: 1.0
 
