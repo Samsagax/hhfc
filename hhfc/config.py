@@ -65,4 +65,7 @@ class Config:
         if not self.config:
             self._read_configuration()
 
-        return float(self.config["INTERVAL"])
+        if "INTERVAL" in self.config:
+            return float(self.config["INTERVAL"])
+
+        return 1.0
