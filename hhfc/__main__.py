@@ -12,6 +12,10 @@ def arg_parse():
                         default="fan_control.yaml",
                         help="Configuration file path"
                         )
+    parser.add_argument('-m', '--monitor',
+                        action='store_true',
+                        help="Monitor mode. When set the fans duty cycles are not modified"
+                        )
 
     return parser.parse_args()
 
@@ -32,7 +36,7 @@ def main():
 
     interval = conf.get_interval()
 
-    control = controller.Controller(fan_list, sensor_list, interval)
+    control = controller.Controller(fan_list, sensor_list, interval, args.monitor)
     control.run()
 
 if __name__ == '__main__':

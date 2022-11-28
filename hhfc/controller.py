@@ -28,12 +28,14 @@ class Controller:
     fans: list[Fan]
     sensors: list[Sensor]
     loop_interval: float
+    monitor: bool
     exit_loop: threading.Event
 
-    def __init__(self, fans: list[Fan], sensors: list[Sensor], loop_interval: float):
+    def __init__(self, fans: list[Fan], sensors: list[Sensor], loop_interval: float, monitor=False):
         self.fans = fans
         self.sensors = sensors
         self.loop_interval = loop_interval
+        self.monitor = monitor
         self.exit_loop = threading.Event()
 
     def _loop_iter(self) -> None:
@@ -52,9 +54,9 @@ class Controller:
                     fan_duty.append(sensor_duty[sensor])
                 else:
                     print(f"Sensor '{sensor}' has no value of duty cycle for fan ('{fan.name}')")
-            fan.set_duty_cycle(int(max(fan_duty)))
+            if not self.monitor:
+                fan.set_duty_cycle(int(max(fan_duty)))
             print(f"fan {fan.name}: {fan.read_input()} RPM")
-
 
     def _loop(self) -> None:
         """Main control loop"""
@@ -74,7 +76,8 @@ class Controller:
         for fan in self.fans:
             try:
                 print("Taking control of fan: " + fan.name)
-                fan.take_control()
+                if not self.monitor:
+                    fan.take_control()
             except Exception as exp:
                 print("Could not take control of fan: " + fan.name)
                 print(exp)
@@ -104,7 +107,8 @@ class Controller:
         for fan in self.fans:
             try:
                 print("Release control of fan: " + fan.name)
-                fan.release_control()
+                if not self.monitor:
+                    fan.release_control()
             except Exception as exp:
                 print("Could not restore fan: " + fan.name)
                 print(exp)
