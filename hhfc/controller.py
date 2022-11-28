@@ -39,21 +39,21 @@ class Controller:
         self.exit_loop = threading.Event()
 
     def _loop_iter(self) -> None:
-        sensor_duty = {}
+        sensor_readings = {}
         for sensor in self.sensors:
-            sensor_duty[sensor.name] = sensor.get_desired_duty_cycle()
-            print(f"sensor {sensor.name}: {sensor.read_input()} °C")
+            sensor_readings[sensor.name] = sensor.read_input()
 
-        print("Duty cycles: ")
-        print(sensor_duty)
+        print("Sensor readings: ")
+        print(sensor_readings)
 
         for fan in self.fans:
             fan_duty = []
             for sensor in fan.sensors:
-                if sensor in sensor_duty:
-                    fan_duty.append(sensor_duty[sensor])
+                if sensor["name"] in sensor_readings:
+                    name = sensor["name"]
+                    fan_duty.append(fan.get_desired_duty_cycle(name, sensor_readings[name]))
                 else:
-                    print(f"Sensor '{sensor}' has no value of duty cycle for fan ('{fan.name}')")
+                    print(f"Sensor '{sensor['name']}' has no value for fan ('{fan.name}')")
             if not self.monitor:
                 fan.set_duty_cycle(int(max(fan_duty)))
             print(f"fan {fan.name}: {fan.read_input()} RPM")

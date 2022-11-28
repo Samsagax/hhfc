@@ -37,46 +37,11 @@ class Sensor:
         self.sensor_input = full_path + sensor_config["temp_input"]
         self.divisor = sensor_config["divisor"] if "divisor" in sensor_config else 1
         self.offset = sensor_config["offset"] if "offset" in sensor_config else 0
-        self.curve = sensor_config["curve"]
 
     def read_input(self) -> float:
         """Check if we are controlling this fan"""
         with open(self.sensor_input, "r", encoding="utf-8") as raw_reading:
             return float(raw_reading.read()) / self.divisor + self.offset
-
-    def get_desired_duty_cycle(self) -> int:
-        """Returns duty cycle for the current sensor state according to the
-        specified curve
-        """
-        value = self.read_input()
-        if value <= self.curve["low"]["temp"]:
-            return self.curve["low"]["duty"]
-        if value >= self.curve["high"]["temp"]:
-            return self.curve["high"]["duty"]
-
-        # Get coefficients of the curve for quadratic interpolation
-        xs = [
-            self.curve["low"]["temp"],
-            self.curve["mid"]["temp"],
-            self.curve["high"]["temp"]
-        ]
-        ys = [
-            self.curve["low"]["duty"],
-            self.curve["mid"]["duty"],
-            self.curve["high"]["duty"]
-        ]
-
-        duty = ys[0] * \
-            (value - xs[1]) * (value - xs[2]) / \
-                ((xs[0] - xs[1]) * (xs[0] - xs[2])) + \
-            ys[1] * \
-            (value - xs[2]) * (value - xs[0]) / \
-                ((xs[1] - xs[2]) * (xs[1] - xs[0])) + \
-            ys[2] * \
-            (value - xs[0]) * (value - xs[1]) / \
-                ((xs[2] - xs[0]) * (xs[2] - xs[1]))
-
-        return duty
 
     def __str__(self) -> str:
         """String representation of the sensor"""

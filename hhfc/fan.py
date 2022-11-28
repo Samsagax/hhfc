@@ -29,7 +29,7 @@ class Fan:
     fan_input: str
     min_val: int
     max_val: int
-    sensors: list[str]
+    sensors: list[dict]
 
     def __init__(self, fan_config: dict):
         full_path = util.find_driver_path(fan_config["driver_name"])
@@ -60,6 +60,47 @@ class Fan:
         with open(self.pwm_enable, "r", encoding="utf-8") as enable:
             string = enable.read()
             return int(string) == 1
+
+    def get_sensor_curve(self, sensor: str) -> dict:
+        """Returns the curve for sensor."""
+        for sens in self.sensors:
+            if sens["name"] == sensor:
+                return sens["curve"]
+        raise ValueError(f"Not such sensor: {sensor}")
+
+    def get_desired_duty_cycle(self, sensor: str, value: float) -> int:
+        """Returns duty cycle for the current sensor state according to the
+        specified curve
+        """
+        curve = self.get_sensor_curve(sensor)
+        if value <= curve["low"]["temp"]:
+            return curve["low"]["duty"]
+        if value >= curve["high"]["temp"]:
+            return curve["high"]["duty"]
+
+        # Get coefficients of the curve for quadratic interpolation
+        xs = [
+            curve["low"]["temp"],
+            curve["mid"]["temp"],
+            curve["high"]["temp"]
+        ]
+        ys = [
+            curve["low"]["duty"],
+            curve["mid"]["duty"],
+            curve["high"]["duty"]
+        ]
+
+        duty = ys[0] * \
+            (value - xs[1]) * (value - xs[2]) / \
+                ((xs[0] - xs[1]) * (xs[0] - xs[2])) + \
+            ys[1] * \
+            (value - xs[2]) * (value - xs[0]) / \
+                ((xs[1] - xs[2]) * (xs[1] - xs[0])) + \
+            ys[2] * \
+            (value - xs[0]) * (value - xs[1]) / \
+                ((xs[2] - xs[0]) * (xs[2] - xs[1]))
+
+        return duty
 
     def set_duty_cycle(self, duty_cycle: float) -> None:
         """Sets duty cycle for this fan in the range [min_value-max_value]

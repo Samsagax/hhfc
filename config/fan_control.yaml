@@ -29,32 +29,11 @@ SENSORS:
     temp_input: "temp1_input"
     divisor: 1000
     offset: 20
-    curve:
-      low:
-        temp: 50
-        duty: 0
-      mid:
-        temp: 70
-        duty: 50
-      high:
-        temp: 85
-        duty: 100
-
   - name: "gpu"
     driver_name: "amdgpu"
     temp_input: "temp1_input"
     divisor: 1000
     offset: 20
-    curve:
-      low:
-        temp: 50
-        duty: 0
-      mid:
-        temp: 70
-        duty: 50
-      high:
-        temp: 85
-        duty: 100
 
 FANS:
   - name: "fan1"
@@ -64,5 +43,26 @@ FANS:
     min_control_value: 0
     fan_input: "fan1_input"
     sensors:
-     - "cpu"
-     - "gpu"
+      - name: "cpu"
+        curve:
+          low:
+            temp: 50
+            duty: 0
+          mid:
+            temp: 70
+            duty: 50
+          high:
+            temp: 85
+            duty: 100
+      - name: "gpu"
+        curve:
+          low:
+            temp: 50
+            duty: 0
+          mid:
+            temp: 70
+            duty: 50
+          high:
+            temp: 85
+            duty: 100
+
