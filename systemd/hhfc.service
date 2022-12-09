@@ -1,0 +1,10 @@
+[Unit]
+Description=Start hhfc daemon, if configuration file is there
+ConditionFileNotEmpty=/etc/hhfc/fan_control.yaml
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/hhfc -c /etc/hhfc/fan_control.yaml
+
+[Install]
+WantedBy=multi-user.target
