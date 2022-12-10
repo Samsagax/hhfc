@@ -1,10 +1,14 @@
 [Unit]
 Description=Start hhfc daemon, if configuration file is there
 ConditionFileNotEmpty=/etc/hhfc/fan_control.yaml
+StartLimitIntervalSec=120
+StartLimitBurst=5
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/hhfc -c /etc/hhfc/fan_control.yaml
+Restart=on-failure
+RestartSec=2s
 
 [Install]
 WantedBy=multi-user.target
