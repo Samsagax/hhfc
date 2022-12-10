@@ -1,5 +1,7 @@
 # Configuration file for fan control
 #
+# Example configuration for the OXP mini AMD device.
+#
 # The file describes fans an sensors, each fan is controlled with a set of
 # one or more sensors.
 #
@@ -21,19 +23,19 @@
 # intermediate value is interpolated quadratically between the low and high
 # thresholds.
 
-INTERVAL: 1.0
+INTERVAL: 0.5
 
 SENSORS:
   - name: "cpu"
     driver_name: "k10temp"
     temp_input: "temp1_input"
     divisor: 1000
-    offset: 20
+    offset: 0
   - name: "gpu"
     driver_name: "amdgpu"
     temp_input: "temp1_input"
     divisor: 1000
-    offset: 20
+    offset: 0
 
 FANS:
   - name: "fan1"
@@ -46,23 +48,23 @@ FANS:
       - name: "cpu"
         curve:
           low:
-            temp: 50
+            temp: 60
             duty: 0
           mid:
-            temp: 70
+            temp: 80
             duty: 50
           high:
-            temp: 85
+            temp: 90
             duty: 100
       - name: "gpu"
         curve:
           low:
-            temp: 50
+            temp: 60
             duty: 0
           mid:
-            temp: 70
+            temp: 80
             duty: 50
           high:
-            temp: 85
+            temp: 90
             duty: 100
 
