@@ -1,4 +1,5 @@
-> :warning: NOTE: This project is currently in the very early stages of development.
+> :warning: NOTE: This project is currently in early stages of development and
+> can change rapidly. Expect breakage between releases.
 
 # The Hwmon Handheld Fan Controller (hhfc)
 
