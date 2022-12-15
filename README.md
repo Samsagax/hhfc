@@ -9,8 +9,53 @@ Originally designed for handhelds but can be configured for anything that has
 sensors and fans exposed via hwmon sysfs exclusively
 (i.e. `/sys/class/hwmon/hwmon?/*`)
 
-## Configuration
+## Install
+On ArchLinux (and derivatives) there is `hhfc-git` package in the
+[AUR](https://aur.archlinux.org/packages/hhfc-git).
 
+For installing from sources you'll need some python packages first:
+ - `build`
+ - `installer`
+ - `wheel`
+ - `setuptools`
+ - `pyyaml`
+
+Then clone sources and build/install
+
+```shell
+$ git clone git+https://github.com/Samsagax/hhfc.git
+$ cd hhfc
+$	python -m build --wheel
+# python -m installer dist/*.whl
+```
+
+For system daemon use copy the systemd unit and enable it:
+```shell
+# cp -v systemd/hhfc.service /usr/lib/systemd/system/hhfc.service
+# systemctl enable hhfc.service
+```
+
+## Usage
+Run `hhfc` with a given configuration file:
+```shell
+$ hhfc -c fan_control.yaml
+```
+
+> :info: You may need root privileges (i.e. sudo) to write to hwmon
+> attribute files.
+
+There are some examples under `config` directory in the repo.
+See [Configuration](#configuration) for writing your own for your machine
+
+### Monitor mode
+You can also run the controller in "monitor mode" by usign the `-m` flag.
+This way the controller won't write to fan handles but can monitor sensor
+readings and fan speeds.
+```shell
+# hhfc -m -c fan_control.yaml
+```
+
+## Configuration
 The driver uses `FANS` and `SENSORS` as the configuration units defined on
 a yaml file.
 
@@ -101,28 +146,6 @@ value reading below the `low` defined `temp` will use the `duty` defined value
 to write to the fan. Any value above `high` defined `temp` will use the `duty`
 value to write to the fan (this is usually `100`)
 
-## Usage
-
-Run `hhfc` with a given configuration file. First clone the repo:
-```shell
-$ git clone https://github.com/Samsagax/hhfc/
-$ cd hhfc
-```
-Then write your own configuration file for your machine and run the controller selecting the configuration file with the `-c` option:
-```shell
-# python -m hhfc -c fan_control.yaml
-```
-
-> :warning: You may need root privileges (i.e. sudo) to write to hwmon
-> attribute files.
-
-### Monitor mode
-You can also run the controller in "monitor mode" by usign the `-m` flag.
-This way the controller won't write to fan handles but can monitor sensor
-readings and fan speeds.
-```shell
-# python -m hhfc -m -c fan_control.yaml
-```
 
 ## Contributing
 
