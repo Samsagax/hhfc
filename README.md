@@ -25,7 +25,7 @@ Then clone sources and build/install
 ```shell
 $ git clone git+https://github.com/Samsagax/hhfc.git
 $ cd hhfc
-$	python -m build --wheel
+$ python -m build --wheel
 # python -m installer dist/*.whl
 ```
 
