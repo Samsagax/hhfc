@@ -129,3 +129,13 @@ class ConfigGenerator:
 
     def add_sensor_configuration(self, sensor_config: dict) -> None:
         self.config["SENSORS"].append(sensor_config)
+
+    def add_sensor_curve_to_fan(self, fan_curve: dict, fan_name: str) -> None:
+        """Add a sensor fan curve to a given fan by name"""
+        
+        for fan in self.config["FANS"]:
+            if fan["name"] == fan_name:
+                fan["sensors"].append(fan_curve)
+                return
+
+        raise ValueError(f"No such fan in configuration ({fan_name})")
