@@ -6,14 +6,14 @@ build-backend = "setuptools.build_meta"
 name = "hhfc"
 version = "0.0.2"
 authors = [
-  { name="Joaquín Ignacio Aramendía", email="samsagax@gmail.com" },
+    { name="Joaquín Ignacio Aramendía", email="samsagax@gmail.com" },
 ]
 description = "hhfc - user space driver for fans based on hwmon sysfs"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
-		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: POSIX :: Linux",
 ]
 dependencies = ["pyyaml"]
