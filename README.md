@@ -29,10 +29,9 @@ $	python -m build --wheel
 # python -m installer dist/*.whl
 ```
 
-For system daemon use copy the systemd unit and enable it:
+For system daemon use copy the systemd unit:
 ```shell
 # cp -v systemd/hhfc.service /usr/lib/systemd/system/hhfc.service
-# systemctl enable hhfc.service
 ```
 
 ## Usage
@@ -46,6 +45,16 @@ $ hhfc -c fan_control.yaml
 
 There are some examples under `config` directory in the repo.
 See [Configuration](#configuration) for writing your own for your machine
+
+### Systemd unit (system daemon)
+The most common usecase once configured is to run it as a system daemon.
+Write a configuration file for your machine and place it in 
+`/etc/hhfc/fan_control.yaml` (create directories if appropriate). Then enable
+the systemd unit if not already. It will look for the system configuration and
+start the daemon:
+```shell
+# systemctl enable hhfc.service
+```
 
 ### Monitor mode
 You can also run the controller in "monitor mode" by usign the `-m` flag.
