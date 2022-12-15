@@ -157,5 +157,9 @@ value to write to the fan (this is usually `100`)
 
 
 ## Contributing
+If you have written configurations for some device that can be generic enough and
+safe to use, please add it as a Gist link in
+[this issue](https://github.com/Samsagax/hhfc/issues/1) or as a Pull Request for
+inclusion.
 
-The project is under the GPLv3 license and all contributions are welcome.
+The project is under the GPLv3 license and all kinds of contributions are welcome.
