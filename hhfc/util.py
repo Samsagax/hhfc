@@ -41,7 +41,7 @@ def list_system_drivers_paths() -> dict:
         with open(full_path + "name", encoding="utf-8") as driver_path:
             name = driver_path.read().strip()
         drivers[name] = full_path
-    
+
     return drivers
 
 def list_fan_drivers() -> dict:
@@ -51,22 +51,41 @@ def list_fan_drivers() -> dict:
      - `fan*_input`
      - `fan*_target`
      - `pwm*`
-    More than one fan can be detected for a single driver. If none are
-    detected, this returns an empty dict.
+    More than one fan can be detected for a single driver. Unusable drivers
+    are filtered (like `pwm` attribute without correcponding `pwm_enable`).
+    If none are detected, this returns an empty dict.
     """
     drivers = list_system_drivers_paths()
     fans = collections.defaultdict(dict)
     for name, path in drivers.items():
-        fan_inputs = glob.glob('fan*_input', root_dir=path)
-        fan_targets = glob.glob('fan*_target', root_dir=path)
-        pwms = glob.glob('pwm*', root_dir=path)    
+        fan_inputs = glob.glob('fan?_input', root_dir=path)
+        fan_targets = glob.glob('fan?_target', root_dir=path)
+        fan_enables = glob.glob('fan?_enable', root_dir=path)
+        pwms = glob.glob('pwm?', root_dir=path)
+        pwms_enable = glob.glob('pwm?_enable', root_dir=path)
         if fan_inputs:
-            fans[name]["input"] = fan_inputs
+            fans[name]["input"] = fan_inputs.sort()
         if pwms:
-            fans[name]["pwm"] = pwms
+            # Remove unusable pwms
+            for pwm in pwms:
+                has_enable = False
+                for enable in pwms_enable:
+                    if pwm in enable:
+                        has_enable = True
+                if not has_enable:
+                    del pwm
+            fans[name]["pwm"] = pwms.sort()
         if fan_targets:
-            fans[name]["target"] = fan_targets
-    
+            # Remove unusable fant_targets
+            for target in fan_targets:
+                has_enable = False
+                for enable in fan_enables:
+                    if target[:4] in enable:
+                        has_enable = True
+                if not has_enable:
+                    del target
+            fans[name]["target"] = fan_targets.sort()
+
     return dict(fans)
 
 def list_sensor_drivers() -> dict:
