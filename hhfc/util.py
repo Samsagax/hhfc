@@ -89,18 +89,22 @@ def list_fan_drivers() -> dict:
     return dict(fans)
 
 def list_sensor_drivers() -> dict:
-    """Looks into drivers list for temperature sensors. Any hwmon driver 
-    with any of this attributes is considered a sensor (note that any driver
-    can be both a fan and a sensor):
-     - `temp*_input`
+    """Looks into drivers list for temperature or power sensors. Any hwmon
+    driver with any of this attributes is considered a sensor (note that any
+    driver can be both a fan and a sensor):
+     - `temp?_input`
+     - `power?_average`
     More than one sensor can be detected for a single driver. If none are
     detected, this returns an empty dict.
     """
     drivers = list_system_drivers_paths()
     sensors = collections.defaultdict(dict)
     for name, path in drivers.items():
-        temp_inputs = glob.glob('temp*_input', root_dir=path)
+        temp_inputs = glob.glob('temp?_input', root_dir=path)
+        power_averages = glob.glob('power?_average', root_dir=path)
         if temp_inputs:
-            sensors[name]["input"] = temp_inputs
-        
+            sensors[name]["temp"] = temp_inputs
+        if power_averages:
+            sensors[name]["power"] = power_averages
+
     return dict(sensors)
