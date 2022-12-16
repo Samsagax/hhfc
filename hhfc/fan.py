@@ -84,10 +84,12 @@ class Fan:
         self.max_val = fan_config["max_control_value"]
         self.allow_shutoff = (fan_config["allow_shutoff"] == "yes")
         self.min_allowed = fan_config["minimum_duty_cycle"]
-        self.sensors = fan_config["sensors"]
-        self.interpolator = {
-            sens["name"]:self._generate_interpolator(sens["name"]) for sens in self.sensors
-        }
+        if "sensors" in fan_config:
+            self.sensors = fan_config["sensors"]
+            self.interpolator = {
+                sens["name"]:self._generate_interpolator(sens["name"]) \
+                                 for sens in self.sensors
+            }
 
     def take_control(self) -> bool:
         """Atempt to take control of the fan from automatic control"""
@@ -169,6 +171,83 @@ class Fan:
 
     def __str__(self) -> str:
         return (self.name + ": " + str(self.read_input()))
+
+
+class FanConfigBuilder:
+    """Build fan configurations and check integrity"""
+
+    config: dict
+
+    def __init__(self, name: str = "fan"):
+        self.config = {}
+        self.config["name"] = name
+
+    @classmethod
+    def from_dict(cls, config: dict):
+        """Generate configuration from dictionary. The dictionary can be a
+        partial configuration for a fan that can be completed with this
+        FanConfigBuilder.
+        """
+        fan_config = cls()
+        fan_config.config = config
+        return fan_config
+
+    def get_config(self) -> dict:
+        """Returns the current fan config as a a dictionary"""
+        try:
+            if self.check_fan():
+                return self.config
+        except ValueError as value_error:
+            print(value_error)
+
+        return None
+
+    def check_fan(self) -> bool:
+        """Check if this fan configuration is valid"""
+        if "name" not in self.config:
+            raise ValueError("Fan config has no name")
+        if "driver_name" not in self.config:
+            raise ValueError("Fan config has no driver")
+        if "fan_input" not in self.config:
+            raise ValueError("Fan config hast no speed monitor")
+        if "handle" not in self.config:
+            raise ValueError("Fan config hast no handle")
+        if "min_control_value" not in self.config:
+            raise ValueError("Fan config hast no minimum control value set")
+        if "max_control_value" not in self.config:
+            raise ValueError("Fan config hast no maximum control value set")
+
+        return True
+
+
+    def set_name(self, name: str) -> None:
+        """Set name for fan"""
+        self.config["name"] = name
+
+    def set_driver_name(self, driver_name: str) -> None:
+        """Set driver name for fan"""
+        self.config["driver_name"] = driver_name
+
+    def set_fan_input(self, fan_input: str) -> None:
+        """Set fan reading for fan"""
+        self.config["fan_input"] = fan_input
+
+    def set_handle(self, handle: str) -> None:
+        """Set handle for fan"""
+        self.config["handle"] = handle
+
+    def set_max_control_value(self, max_value: int) -> None:
+        """Set fan max_value"""
+        self.config["max_control_value"] = max_value
+
+    def set_min_control_value(self, min_value: int) -> None:
+        """Set fan min_value"""
+        self.config["min_control_value"] = min_value
+
+    def set_sensors(self, sensors: list[dict]) -> None:
+        """Set sensors curves for this fan to watch"""
+        self.config["sensors"] = sensors
+
 
 def fan_from_config(fan_config: dict) -> Fan:
     """Generate a Fan object with the configration passed as dictionary"""
