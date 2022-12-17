@@ -41,7 +41,14 @@ class Interpolator:
         return result
 
     def get_value(self, x: float) -> float:
-        """Evaluate at x"""
+        """Evaluate at x, if x is lower than the lowest x, return the lowest
+        value
+        """
+        if x <= self.x_vals[0]:
+            return self.y_vals[0]
+        if x >= self.x_vals[-1]:
+            return self.y_vals[-1]
+
         k = len(self.x_vals)
         result = 0
         for j in range(k):
@@ -60,7 +67,7 @@ class Fan:
     min_val: int
     max_val: int
     sensors: list[dict]
-    interpolator: list[dict]
+    interpolator: dict
 
     def __init__(self, fan_config: dict):
         full_path = util.find_driver_path(fan_config["driver_name"])
@@ -73,6 +80,7 @@ class Fan:
         self.min_val = fan_config["min_control_value"]
         self.max_val = fan_config["max_control_value"]
         self.sensors = fan_config["sensors"]
+        self.interpolator = { sens["name"]:self._generate_interpolator(sens["name"]) for sens in self.sensors }
 
     def take_control(self) -> bool:
         """Atempt to take control of the fan from automatic control"""
@@ -99,31 +107,19 @@ class Fan:
                 return sens["curve"]
         raise ValueError(f"Not such sensor: {sensor}")
 
+    def _generate_interpolator(self, sensor: str) -> Interpolator:
+        """Returns a Interpolator object for given sensor name"""
+        curve = self.get_sensor_curve(sensor)
+        temps = [ column[0] for column in curve ]
+        dutys = [ column[1] for column in curve ]
+        return Interpolator(temps, dutys)
+
+
     def get_desired_duty_cycle(self, sensor: str, value: float) -> int:
         """Returns duty cycle for the current sensor state according to the
         specified curve
         """
-        curve = self.get_sensor_curve(sensor)
-        if value <= curve["low"]["temp"]:
-            return curve["low"]["duty"]
-        if value >= curve["high"]["temp"]:
-            return curve["high"]["duty"]
-
-        # Get coefficients of the curve for quadratic interpolation
-        xs = [
-            curve["low"]["temp"],
-            curve["mid"]["temp"],
-            curve["high"]["temp"]
-        ]
-        ys = [
-            curve["low"]["duty"],
-            curve["mid"]["duty"],
-            curve["high"]["duty"]
-        ]
-
-        interpolator = Interpolator(xs, ys)
-
-        return interpolator.get_value(value)
+        return self.interpolator[sensor].get_value(value)
 
     def set_duty_cycle(self, duty_cycle: float) -> None:
         """Sets duty cycle for this fan in the range [min_value-max_value]
