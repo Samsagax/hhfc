@@ -18,6 +18,36 @@ with hhfc. If not, see <https://www.gnu.org/licenses/>.
 
 from . import util
 
+class Interpolator:
+    """Interpolator of a curve between given points at initialization"""
+
+    x_vals: list[float]
+    y_vals: list[float]
+
+    def __init__(self, x_vals: list[float], y_vals: list[float]):
+        if not len(x_vals) == len(y_vals):
+            raise ValueError(f"x_vals and y_vals need to be the same lenght")
+        self.x_vals = x_vals
+        self.y_vals = y_vals
+
+    def _compute_l_poly_value(self, j: int, x: float) -> float:
+        """Compute the j-th lagrange polynomial at point x"""
+        k = len(self.x_vals)
+        result = 1
+        for m in range(k):
+            if m == j:
+                continue
+            result *= (x - self.x_vals[m]) / (self.x_vals[j] - self.x_vals[m])
+        return result
+
+    def get_value(self, x: float) -> float:
+        """Evaluate at x"""
+        k = len(self.x_vals)
+        result = 0
+        for j in range(k):
+            result += self.y_vals[j] * self._compute_l_poly_value(j, x)
+        return result
+
 
 class Fan:
     """Class to represent and control a fan"""
@@ -30,6 +60,7 @@ class Fan:
     min_val: int
     max_val: int
     sensors: list[dict]
+    interpolator: list[dict]
 
     def __init__(self, fan_config: dict):
         full_path = util.find_driver_path(fan_config["driver_name"])
@@ -90,17 +121,9 @@ class Fan:
             curve["high"]["duty"]
         ]
 
-        duty = ys[0] * \
-            (value - xs[1]) * (value - xs[2]) / \
-                ((xs[0] - xs[1]) * (xs[0] - xs[2])) + \
-            ys[1] * \
-            (value - xs[2]) * (value - xs[0]) / \
-                ((xs[1] - xs[2]) * (xs[1] - xs[0])) + \
-            ys[2] * \
-            (value - xs[0]) * (value - xs[1]) / \
-                ((xs[2] - xs[0]) * (xs[2] - xs[1]))
+        interpolator = Interpolator(xs, ys)
 
-        return duty
+        return interpolator.get_value(value)
 
     def set_duty_cycle(self, duty_cycle: float) -> None:
         """Sets duty cycle for this fan in the range [min_value-max_value]
