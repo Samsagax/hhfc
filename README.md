@@ -91,9 +91,11 @@ SENSORS:
 - `driver_name` is the name of the hwmon driver to watch (i.e.
 `/sys/class/hwmon?/name` attribute)
 - `temp_input` name of the attribute file to read temperatures from.
-- `divisor` the value to divide the read `temp_input`. Typical value is `1000`.
+- `divisor` the value to divide the read `temp_input`. This is an optional
+parameter, if not set it will default to `1000`.
 - `offset` the value to add to the read `temp_input` after the division. Most
-chips expose the temperature with an offset of 20°C
+chips expose the temperature with an offset of 20°C. This parameter is optional
+and will default to `0` if not set.
 
 Each sensor needs to be prepended with a list marker (i.e. `-`)
 
@@ -134,7 +136,8 @@ FANS:
 - `max_control_value` and `min_control_value` are the min and max value the
 controller will write to the `handle`. Duty cycles are defined and used in the
 [0-100] interval, written values will be mapped to [min-max] values before
-writting.
+writting. This parameters are optional, if not set they will default to the
+range [0-255].
 - `fan_input` is the hwmon attribute to read fan speed from.
 - `sensors` define a list of sensors and its curves this fan will monitor. Each
 sensor curve definition needs to start with a list marker.

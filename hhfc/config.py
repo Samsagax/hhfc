@@ -18,15 +18,29 @@ with hhfc. If not, see <https://www.gnu.org/licenses/>.
 
 import yaml
 
+# Default valoes for configuration
+## Controller
+DEFAULT_INTERVAL = 1.0
+
+## Sensors
+DEFAULT_SENSOR_DIVISOR = 1000
+DEFAULT_SENSOR_OFFSET = 0
+
+## Fans
+DEFAULT_FAN_MIN_CONTROL_VALUE = 0
+DEFAULT_FAN_MAX_CONTROL_VALUE = 255
+
 
 class Config:
     """Class to manage configuration files"""
 
     config: dict
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, auto_load: bool = False):
         self.file_path = file_path
         self.config = None
+        if auto_load:
+            self._read_configuration()
 
     def _read_configuration(self) -> None:
         """Users should not call this function directly, would be called when
@@ -34,6 +48,23 @@ class Config:
         """
         with open(self.file_path, 'r', encoding='utf-8') as file:
             self.config = yaml.safe_load(file)
+
+        # Set default values if not configured
+        if "INTERVAL" not in self.config:
+            self.config["INTERVAL"] = DEFAULT_INTERVAL
+
+        for sensor in self.get_sensors_config():
+            if "divisor" not in sensor:
+                sensor["divisor"] = DEFAULT_SENSOR_DIVISOR
+            if "offset" not in sensor:
+                sensor["offset"] = DEFAULT_SENSOR_OFFSET
+
+        for fan in self.get_fans_config():
+            if "max_control_value" not in fan:
+                fan["max_control_value"] = DEFAULT_FAN_MAX_CONTROL_VALUE
+            if "mim_control_value" not in fan:
+                fan["mim_control_value"] = DEFAULT_FAN_MIN_CONTROL_VALUE
+
 
     def get_full_config(self) -> dict:
         """Get entire read dictionary, used for debug, mostly"""
@@ -65,7 +96,4 @@ class Config:
         if not self.config:
             self._read_configuration()
 
-        if "INTERVAL" in self.config:
-            return float(self.config["INTERVAL"])
-
-        return 1.0
+        return self.config["INTERVAL"]
