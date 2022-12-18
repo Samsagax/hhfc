@@ -48,7 +48,7 @@ See [Configuration](#configuration) for writing your own for your machine
 
 ### Systemd unit (system daemon)
 The most common usecase once configured is to run it as a system daemon.
-Write a configuration file for your machine and place it in 
+Write a configuration file for your machine and place it in
 `/etc/hhfc/fan_control.yaml` (create directories if appropriate). Then enable
 the systemd unit if not already. It will look for the system configuration and
 start the daemon:
@@ -113,27 +113,17 @@ FANS:
     fan_input: "fan1_input"
     sensors:
       - name: "cpu"
-        curve:
-          low:
-            temp: 50
-            duty: 0
-          mid:
-            temp: 70
-            duty: 50
-          high:
-            temp: 85
-            duty: 100
+        curve: [
+         [60, 0],
+         [80, 50],
+         [90, 100]
+        ]
       - name: "gpu"
-        curve:
-          low:
-            temp: 50
-            duty: 0
-          mid:
-            temp: 70
-            duty: 50
-          high:
-            temp: 85
-            duty: 100
+        curve: [
+         [60, 0],
+         [80, 50],
+         [90, 100]
+        ]
 ```
 
 - `name` is the name to reference this fan.
@@ -149,11 +139,10 @@ writting.
 - `sensors` define a list of sensors and its curves this fan will monitor. Each
 sensor curve definition needs to start with a list marker.
 	- `name` is the sensor name that will be matched from the `SENSORS` section
-	- `curve` defines three points with temperatires and corresponding duty
-cycles. The `low` and `high` points will also work as cutoffs. Any temperature
-value reading below the `low` defined `temp` will use the `duty` defined value
-to write to the fan. Any value above `high` defined `temp` will use the `duty`
-value to write to the fan (this is usually `100`)
+	- `curve` defines points with temperatures and corresponding duty
+cycles. The lowest and higher points will also work as cutoffs. Any temperature
+value reading below the lowest or higher than highest will be set to the
+corresponding duty cycle value. Duty cycle is on the range [0, 100].
 
 
 ## Contributing

@@ -16,12 +16,11 @@
 # value for the fan would be the maximum of all the sensors monitored by that
 # fan.
 #
-# Each sensor need to specify three points in the curve temp/duty-cycle.
-# The lowest one defines a low threshold. Below the low temperature the fan
+# Each sensor need to specify at least two points in the curve temp/duty-cycle.
+# The lowest one defines a low threshold. Below the lowest temperature the fan
 # duty-cycle is set to the same low value. The highest point defines the upper
-# threshold in the same way. The middle point defines the curve. Each
-# intermediate value is interpolated quadratically between the low and high
-# thresholds.
+# threshold in the same way. Any middle points define the curve that will be
+# interpolated with a polynomial between the low and high thresholds.
 
 INTERVAL: 0.5
 
