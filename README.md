@@ -113,6 +113,8 @@ FANS:
     max_control_value: 255
     min_control_value: 0
     fan_input: "fan1_input"
+    allow_shutoff: yes
+    minimum_duty_cycle: 30
     sensors:
       - name: "cpu"
         curve: [
@@ -139,6 +141,11 @@ controller will write to the `handle`. Duty cycles are defined and used in the
 writting. This parameters are optional, if not set they will default to the
 range [0-255].
 - `fan_input` is the hwmon attribute to read fan speed from.
+- `allow_shutoff` determines if the fan is allowed to be shut off. The value
+should be "yes" or "no" (default). If the fan is allowed to shut off completely
+the value of `minimum_duty_cycle` will be used to turn it on and the lowest
+value in the fan curve will shut it off. If the value is "no", the value of
+`minimum_duty_cycle` will be used as the lowest value for the fan.
 - `sensors` define a list of sensors and its curves this fan will monitor. Each
 sensor curve definition needs to start with a list marker.
 	- `name` is the sensor name that will be matched from the `SENSORS` section

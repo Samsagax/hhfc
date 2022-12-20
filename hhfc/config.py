@@ -29,6 +29,8 @@ DEFAULT_SENSOR_OFFSET = 0
 ## Fans
 DEFAULT_FAN_MIN_CONTROL_VALUE = 0
 DEFAULT_FAN_MAX_CONTROL_VALUE = 255
+DEFAULT_FAN_ALLOW_SHUTOFF = "no"
+DEFAULT_FAN_MINIMUM_DUTY_CYCLE = 30
 
 
 class Config:
@@ -64,7 +66,10 @@ class Config:
                 fan["max_control_value"] = DEFAULT_FAN_MAX_CONTROL_VALUE
             if "mim_control_value" not in fan:
                 fan["mim_control_value"] = DEFAULT_FAN_MIN_CONTROL_VALUE
-
+            if "allow_shutoff" not in fan:
+                fan["allow_shutoff"] = DEFAULT_FAN_ALLOW_SHUTOFF
+            if "minimum_duty_cycle" not in fan:
+                fan["minimum_duty_cycle"] = DEFAULT_FAN_MINIMUM_DUTY_CYCLE
 
     def get_full_config(self) -> dict:
         """Get entire read dictionary, used for debug, mostly"""

@@ -26,7 +26,7 @@ class Interpolator:
 
     def __init__(self, x_vals: list[float], y_vals: list[float]):
         if not len(x_vals) == len(y_vals):
-            raise ValueError(f"x_vals and y_vals need to be the same lenght")
+            raise ValueError("x_vals and y_vals need to be the same lenght")
         self.x_vals = x_vals
         self.y_vals = y_vals
 
@@ -53,6 +53,7 @@ class Interpolator:
         result = 0
         for j in range(k):
             result += self.y_vals[j] * self._compute_l_poly_value(j, x)
+
         return result
 
 
@@ -66,6 +67,8 @@ class Fan:
     fan_input: str
     min_val: int
     max_val: int
+    allow_shutoff: bool
+    min_allowed: int
     sensors: list[dict]
     interpolator: dict
 
@@ -79,6 +82,8 @@ class Fan:
         self.pwm_input = full_path + fan_config["handle"]
         self.min_val = fan_config["min_control_value"]
         self.max_val = fan_config["max_control_value"]
+        self.allow_shutoff = (fan_config["allow_shutoff"] == "yes")
+        self.min_allowed = fan_config["minimum_duty_cycle"]
         self.sensors = fan_config["sensors"]
         self.interpolator = { sens["name"]:self._generate_interpolator(sens["name"]) for sens in self.sensors }
 
@@ -114,7 +119,6 @@ class Fan:
         dutys = [ column[1] for column in curve ]
         return Interpolator(temps, dutys)
 
-
     def get_desired_duty_cycle(self, sensor: str, value: float) -> int:
         """Returns duty cycle for the current sensor state according to the
         specified curve
@@ -124,10 +128,23 @@ class Fan:
     def set_duty_cycle(self, duty_cycle: float) -> None:
         """Sets duty cycle for this fan in the range [min_value-max_value]
         for the hwmon interface of choice. The input value `duty_cycle` should
-        be in the range [0-100]. This function will scale acordingly
+        be in the range [0-100]. This function will scale acordingly.
+        If the fan has shut-off policy set to "no" then it won't output a lower
+        value than "minimum_duty_cycle".
+        If the fan has shut-off policy set to "yes" then any value below
+        "minimum_duty_cycle" will make the fan to turn off completely.
         """
         if duty_cycle < 0 or duty_cycle > 100:
             raise ValueError("Duty cycle has to be in the range [0-100]")
+
+        # Enforce shutoff and min_value policy
+        if duty_cycle < self.min_allowed:
+            if not self.allow_shutoff:
+                duty_cycle = self.min_allowed
+            else:
+                duty_cycle = 0
+
+        # Scale value
         duty = duty_cycle * (self.max_val - self.min_val) / 100.0
 
         if not self.check_control():
