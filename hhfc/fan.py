@@ -44,9 +44,9 @@ class Interpolator:
         """Evaluate at x, if x is lower than the lowest x, return the lowest
         value
         """
-        if x <= self.x_vals[0]:
+        if x < self.x_vals[0]:
             return self.y_vals[0]
-        if x >= self.x_vals[-1]:
+        if x > self.x_vals[-1]:
             return self.y_vals[-1]
 
         k = len(self.x_vals)
