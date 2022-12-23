@@ -64,7 +64,7 @@ class Config:
         for fan in self.get_fans_config():
             if "max_control_value" not in fan:
                 fan["max_control_value"] = DEFAULT_FAN_MAX_CONTROL_VALUE
-            if "mim_control_value" not in fan:
+            if "min_control_value" not in fan:
                 fan["mim_control_value"] = DEFAULT_FAN_MIN_CONTROL_VALUE
             if "allow_shutoff" not in fan:
                 fan["allow_shutoff"] = DEFAULT_FAN_ALLOW_SHUTOFF
