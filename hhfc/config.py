@@ -65,7 +65,7 @@ class Config:
             if "max_control_value" not in fan:
                 fan["max_control_value"] = DEFAULT_FAN_MAX_CONTROL_VALUE
             if "min_control_value" not in fan:
-                fan["mim_control_value"] = DEFAULT_FAN_MIN_CONTROL_VALUE
+                fan["min_control_value"] = DEFAULT_FAN_MIN_CONTROL_VALUE
             if "allow_shutoff" not in fan:
                 fan["allow_shutoff"] = DEFAULT_FAN_ALLOW_SHUTOFF
             if "minimum_duty_cycle" not in fan:
