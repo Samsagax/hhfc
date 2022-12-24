@@ -43,8 +43,9 @@ class Controller:
         for sensor in self.sensors:
             sensor_readings[sensor.name] = sensor.read_input()
 
-        print("Sensor readings: ")
-        print(sensor_readings)
+        if self.monitor:
+            print("Sensor readings: ")
+            print(sensor_readings)
 
         for fan in self.fans:
             fan_duty = []
@@ -56,7 +57,8 @@ class Controller:
                     print(f"Sensor '{sensor['name']}' has no value for fan ('{fan.name}')")
             if not self.monitor:
                 fan.set_duty_cycle(int(max(fan_duty)))
-            print(f"fan {fan.name}: {fan.read_input()} RPM")
+            if self.monitor:
+                print(f"fan {fan.name}: {fan.read_input()} RPM")
 
     def _loop(self) -> None:
         """Main control loop"""
