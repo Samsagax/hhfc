@@ -17,7 +17,7 @@ with hhfc. If not, see <https://www.gnu.org/licenses/>.
 """
 
 import threading
-from time import sleep
+import logging
 from hhfc.fan import Fan
 from hhfc.sensor import Sensor
 
@@ -43,9 +43,7 @@ class Controller:
         for sensor in self.sensors:
             sensor_readings[sensor.name] = sensor.read_input()
 
-        if self.monitor:
-            print("Sensor readings: ")
-            print(sensor_readings)
+        logging.debug("Sensor readings: %s", str(sensor_readings))
 
         for fan in self.fans:
             fan_duty = []
@@ -54,11 +52,15 @@ class Controller:
                     name = sensor["name"]
                     fan_duty.append(fan.get_desired_duty_cycle(name, sensor_readings[name]))
                 else:
-                    print(f"Sensor '{sensor['name']}' has no value for fan ('{fan.name}')")
+                    logging.warning("Sensor '%s' has no value for fan '%s'",
+                                    sensor['name'],
+                                    fan.name
+                                    )
             if not self.monitor:
                 fan.set_duty_cycle(int(max(fan_duty)))
-            if self.monitor:
-                print(f"fan {fan.name}: {fan.read_input()} RPM")
+                logging.debug("fan %s: %s RPM", fan.name, fan.read_input())
+            else:
+                logging.info("fan %s: %s RPM", fan.name, fan.read_input())
 
     def _loop(self) -> None:
         """Main control loop"""
@@ -68,50 +70,48 @@ class Controller:
                 return
 
     def get_sensors_for_fan(self, fan_idx: int) -> None:
+        """Get the list of sensors for given fan index"""
         return self.fans[fan_idx]["sensors"]
 
     def run(self):
         """Runs the controller thread. This does not exit until interrupted"""
 
         # Set up
-        print("Taking over fans")
+        logging.info("Taking over fans")
         for fan in self.fans:
             try:
-                print("Taking control of fan: " + fan.name)
+                logging.info("Taking control of fan: %s", fan.name)
                 if not self.monitor:
                     fan.take_control()
             except Exception as exp:
-                print("Could not take control of fan: " + fan.name)
-                print(exp)
+                logging.error("Could not take control of fan: %s", fan.name)
+                logging.error(exp)
 
         self.exit_loop.clear()
         loop = threading.Thread(target=self._loop, daemon=False)
 
-        print("Starting control loop")
+        logging.debug("Starting control loop")
         loop.start()
 
         try:
             loop.join()
         except (KeyboardInterrupt, SystemExit):
-            print("Got Interrupt signal, exiting")
+            logging.info("Got Interrupt signal, bye!")
             self.exit_loop.set()
         except IOError as ioerr:
-            print("Got IOError")
+            logging.error("Got IOError: %s", ioerr)
             self.exit_loop.set()
-            print(ioerr)
         except Exception as exp:
-            print("Uncaught Exception")
+            logging.warning("Uncaught Exception: %s", exp)
             self.exit_loop.set()
-            print(exp)
 
         # Cleanup
-        print("Restoring fans to automatic mode")
+        logging.info("Restoring fans to automatic mode")
         for fan in self.fans:
             try:
-                print("Release control of fan: " + fan.name)
+                logging.info("Release control of fan: %s", fan.name)
                 if not self.monitor:
                     fan.release_control()
             except Exception as exp:
-                print("Could not restore fan: " + fan.name)
-                print(exp)
-
+                logging.error("Could not restore fan: %s", fan.name)
+                logging.error(exp)

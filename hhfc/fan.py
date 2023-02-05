@@ -85,7 +85,9 @@ class Fan:
         self.allow_shutoff = (fan_config["allow_shutoff"] == "yes")
         self.min_allowed = fan_config["minimum_duty_cycle"]
         self.sensors = fan_config["sensors"]
-        self.interpolator = { sens["name"]:self._generate_interpolator(sens["name"]) for sens in self.sensors }
+        self.interpolator = {
+            sens["name"]:self._generate_interpolator(sens["name"]) for sens in self.sensors
+        }
 
     def take_control(self) -> bool:
         """Atempt to take control of the fan from automatic control"""
