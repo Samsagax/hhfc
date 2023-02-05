@@ -43,7 +43,10 @@ class Controller:
         for sensor in self.sensors:
             sensor_readings[sensor.name] = sensor.read_input()
 
-        logging.debug("Sensor readings: %s", str(sensor_readings))
+        if self.monitor:
+            logging.info("Sensor readings: %s", str(sensor_readings))
+        else:
+            logging.debug("Sensor readings: %s", str(sensor_readings))
 
         for fan in self.fans:
             fan_duty = []
@@ -60,7 +63,11 @@ class Controller:
                 fan.set_duty_cycle(int(max(fan_duty)))
                 logging.debug("fan %s: %s RPM", fan.name, fan.read_input())
             else:
-                logging.info("fan %s: %s RPM", fan.name, fan.read_input())
+                logging.info("fan %s: %s RPM (%i)",
+                             fan.name,
+                             fan.read_input(),
+                             int(max(fan_duty))
+                             )
 
     def _loop(self) -> None:
         """Main control loop"""
