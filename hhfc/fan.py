@@ -125,7 +125,14 @@ class Fan:
         """Returns duty cycle for the current sensor state according to the
         specified curve
         """
-        return self.interpolator[sensor].get_value(value)
+        interp = self.interpolator[sensor].get_value(value)
+        # Modify value with shutoff and min_value policy
+        if interp <= self.min_allowed:
+            if not self.allow_shutoff:
+                interp = self.min_allowed
+            else:
+                interp = 0
+        return interp
 
     def set_duty_cycle(self, duty_cycle: int) -> None:
         """Sets duty cycle for this fan in the range [min_value-max_value]
