@@ -69,6 +69,26 @@ class Controller:
             if self.exit_loop.wait(timeout=self.loop_interval):
                 return
 
+    def _take_over_fans(self):
+        """Put all fans in manual mode"""
+        for fan in self.fans:
+            try:
+                logging.info("Taking control of fan: %s", fan.name)
+                fan.take_control()
+            except Exception as exp:
+                logging.error("Could not take control of fan: %s", fan.name)
+                logging.error(exp)
+
+    def _release_fans(self):
+        """Put all fans in automatic mode"""
+        for fan in self.fans:
+            try:
+                logging.info("Release control of fan: %s", fan.name)
+                fan.release_control()
+            except Exception as exp:
+                logging.error("Could not release fan: %s", fan.name)
+                logging.error(exp)
+
     def get_sensors_for_fan(self, fan_idx: int) -> None:
         """Get the list of sensors for given fan index"""
         return self.fans[fan_idx]["sensors"]
@@ -77,15 +97,11 @@ class Controller:
         """Runs the controller thread. This does not exit until interrupted"""
 
         # Set up
-        logging.info("Taking over fans")
-        for fan in self.fans:
-            try:
-                logging.info("Taking control of fan: %s", fan.name)
-                if not self.monitor:
-                    fan.take_control()
-            except Exception as exp:
-                logging.error("Could not take control of fan: %s", fan.name)
-                logging.error(exp)
+        if self.monitor:
+            logging.info("Monitor mode, not taking over fans")
+        else:
+            logging.info("Taking over fans")
+            self._take_over_fans()
 
         self.exit_loop.clear()
         loop = threading.Thread(target=self._loop, daemon=False)
@@ -106,12 +122,8 @@ class Controller:
             self.exit_loop.set()
 
         # Cleanup
-        logging.info("Restoring fans to automatic mode")
-        for fan in self.fans:
-            try:
-                logging.info("Release control of fan: %s", fan.name)
-                if not self.monitor:
-                    fan.release_control()
-            except Exception as exp:
-                logging.error("Could not restore fan: %s", fan.name)
-                logging.error(exp)
+        if self.monitor:
+            logging.info("Monitor mode, not restoring fans to automatic mode")
+        else:
+            logging.info("Restoring fans to automatic mode")
+            self._release_fans()
