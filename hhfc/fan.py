@@ -21,16 +21,16 @@ from . import util
 class Interpolator:
     """Interpolator of a curve between given points at initialization"""
 
-    x_vals: list[float]
-    y_vals: list[float]
+    x_vals: list[int]
+    y_vals: list[int]
 
-    def __init__(self, x_vals: list[float], y_vals: list[float]):
+    def __init__(self, x_vals: list[int], y_vals: list[int]):
         if not len(x_vals) == len(y_vals):
             raise ValueError("x_vals and y_vals need to be the same lenght")
         self.x_vals = x_vals
         self.y_vals = y_vals
 
-    def _compute_l_poly_value(self, j: int, x: float) -> float:
+    def _compute_l_poly_value(self, j: int, x: int) -> int:
         """Compute the j-th lagrange polynomial at point x"""
         k = len(self.x_vals)
         result = 1
@@ -40,7 +40,7 @@ class Interpolator:
             result *= (x - self.x_vals[m]) / (self.x_vals[j] - self.x_vals[m])
         return result
 
-    def get_value(self, x: float) -> float:
+    def get_value(self, x: int) -> int:
         """Evaluate at x, if x is lower than the lowest x, return the lowest
         value
         """
@@ -121,13 +121,13 @@ class Fan:
         dutys = [ column[1] for column in curve ]
         return Interpolator(temps, dutys)
 
-    def get_desired_duty_cycle(self, sensor: str, value: float) -> int:
+    def get_desired_duty_cycle(self, sensor: str, value: int) -> int:
         """Returns duty cycle for the current sensor state according to the
         specified curve
         """
         return self.interpolator[sensor].get_value(value)
 
-    def set_duty_cycle(self, duty_cycle: float) -> None:
+    def set_duty_cycle(self, duty_cycle: int) -> None:
         """Sets duty cycle for this fan in the range [min_value-max_value]
         for the hwmon interface of choice. The input value `duty_cycle` should
         be in the range [0-100]. This function will scale acordingly.
@@ -140,7 +140,7 @@ class Fan:
             raise ValueError("Duty cycle has to be in the range [0-100]")
 
         # Enforce shutoff and min_value policy
-        if duty_cycle < self.min_allowed:
+        if duty_cycle <= self.min_allowed:
             if not self.allow_shutoff:
                 duty_cycle = self.min_allowed
             else:
