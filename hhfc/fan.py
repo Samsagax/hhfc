@@ -16,6 +16,7 @@ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 with hhfc. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import logging
 from . import util
 
 class Interpolator:
@@ -157,7 +158,7 @@ class Fan:
         duty = duty_cycle * (self.max_val - self.min_val) / 100.0
 
         if not self.check_control():
-            raise IOError("Cant write to the fan control file")
+            logging.warning("Cant write to the fan control file. Duty cycle setting may fail")
 
         with open(self.pwm_input, "w", encoding="utf-8") as pwm:
             pwm.write(str(int(duty)))

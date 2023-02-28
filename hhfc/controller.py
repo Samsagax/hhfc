@@ -60,6 +60,7 @@ class Controller:
                                     fan.name
                                     )
             if not self.monitor:
+                logging.debug("fan %s: setting duty cycle to %s", fan.name, int(max(fan_duty)))
                 fan.set_duty_cycle(int(max(fan_duty)))
                 logging.debug("fan %s: %s RPM", fan.name, fan.read_input())
             else:
