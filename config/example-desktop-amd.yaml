@@ -1,0 +1,74 @@
+# Configuration file for fan control
+#
+# Example of a RVZ 02 case with GPU, CPU and case fan control.
+#
+# NOTE: This particular system is a GIGABYTE A520I motherboard with an it87
+# controlled EC. The module in mainline kernel does not yet support this
+# motherboard but the it87-dkms module can be forced to load with the correct
+# values.
+#
+# The system configuration for fan control purposes is:
+#   - AMD Ryzen 5600X
+#   - AMD RX 6900 XT GPU
+# Four fans connected to three motherboard headers:
+#   - One on the CPU cooler
+#   - One in the CPU side of the case
+#   - Two in the GPU side of the case with a splitter to a single header.
+#
+# You may need to adjust to your specific hardware.
+
+INTERVAL: 1.0
+
+SENSORS:
+  - name: "CPU"
+    driver_name: "k10temp"
+    temp_input: "temp1_input"
+  - name: "GPU"
+    driver_name: "amdgpu"
+    temp_input: "temp1_input"
+
+FANS:
+  - name: "CPU Cooler"
+    driver_name: "it8688"
+    handle: "pwm1"
+    fan_input: "fan1_input"
+    sensors:
+      - name: "CPU"
+        curve: [
+         [60, 30],
+         [75, 50],
+         [95, 100]
+        ]
+  - name: "CPU Side Case"
+    driver_name: "it8688"
+    handle: "pwm2"
+    fan_input: "fan2_input"
+    sensors:
+      - name: "CPU"
+        curve: [
+         [55, 30],
+         [70, 50],
+         [90, 100]
+        ]
+  - name: "GPU Cooler"
+    driver_name: "amdgpu"
+    handle: "pwm1"
+    fan_input: "fan1_input"
+    sensors:
+      - name: "GPU"
+        curve: [
+         [60, 30],
+         [75, 50],
+         [95, 100]
+        ]
+  - name: "GPU Side Case"
+    driver_name: "it8688"
+    handle: "pwm3"
+    fan_input: "fan3_input"
+    sensors:
+      - name: "GPU"
+        curve: [
+         [55, 30],
+         [70, 50],
+         [90, 100]
+        ]
