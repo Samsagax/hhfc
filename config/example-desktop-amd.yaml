@@ -37,7 +37,7 @@ FANS:
         curve: [
          [60, 30],
          [75, 50],
-         [95, 100]
+         [85, 100]
         ]
   - name: "CPU Side Case"
     driver_name: "it8688"
@@ -48,7 +48,7 @@ FANS:
         curve: [
          [55, 30],
          [70, 50],
-         [90, 100]
+         [80, 100]
         ]
   - name: "GPU Cooler"
     driver_name: "amdgpu"
@@ -59,7 +59,7 @@ FANS:
         curve: [
          [60, 30],
          [75, 50],
-         [95, 100]
+         [85, 100]
         ]
   - name: "GPU Side Case"
     driver_name: "it8688"
@@ -70,5 +70,5 @@ FANS:
         curve: [
          [55, 30],
          [70, 50],
-         [90, 100]
+         [80, 100]
         ]
