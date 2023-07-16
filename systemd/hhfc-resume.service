@@ -1,0 +1,10 @@
+[Unit]
+Description=Workaround to restart hhfc after Suspend
+After=suspend.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/systemctl restart hhfc.service
+
+[Install]
+WantedBy=suspend.target
